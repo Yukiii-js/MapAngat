@@ -44,4 +44,15 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 */
 /** @var object $router **/
 
-$router->get('/', 'Welcome::index');
+$router->get('/', 'Auth::login');
+$router->get('login', 'Auth::login');
+$router->get('logout', 'Auth::logout');
+$router->get('dashboard', 'Dashboard::index');
+$router->get('web-gis', 'Dashboard::webgis');
+$router->get('spatial-analysis', 'Spatial::index');
+$router->get('location-clearance', 'Clearance::index');
+$router->get('program-monitoring', 'Projects::index');
+$router->get('qr-verification', 'QRField::index');
+$router->post('auth/process_login', 'Auth::process_login');
+$router->post('location-clearance/store', 'Clearance::store');
+$router->post('spatial-analysis/run-screening', 'Spatial::run_screening');
