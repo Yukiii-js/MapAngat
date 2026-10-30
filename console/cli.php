@@ -170,7 +170,7 @@ function handle_run_command($port = null, array $flags = []) {
     echo "Server running on: \033[1;36m{$url}\033[0m" . PHP_EOL;
     echo "Press Ctrl+C to stop the server." . PHP_EOL . PHP_EOL;
 
-    $command = sprintf('php -S %s:%d -t %s', $host, $port, escapeshellarg(PUBLIC_DIR));
+    $command = sprintf('php -S %s:%d %s', $host, $port, escapeshellarg(dirname(__DIR__, 1) . DIRECTORY_SEPARATOR . 'router.php'));
     passthru($command);
 }
 

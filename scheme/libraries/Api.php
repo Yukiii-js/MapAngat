@@ -82,6 +82,16 @@ class Api
     protected $users_table = 'users';
 
     /**
+     * User role lookup configuration
+     *
+     * @var string
+     */
+    protected $users_role_column = 'role';
+    protected $users_role_table = '';
+    protected $roles_primary_key = 'id';
+    protected $roles_name_column = 'role_name';
+
+    /**
      * Verify User On Each Request
      *
      * When TRUE, require_jwt() checks that the user exists and takes
@@ -173,6 +183,10 @@ class Api
         // Load config
         $this->refresh_token_table      = config_item('refresh_token_table') ?? $this->refresh_token_table;
         $this->users_table              = config_item('users_table') ?? $this->users_table;
+        $this->users_role_column        = config_item('users_role_column') ?? $this->users_role_column;
+        $this->users_role_table         = config_item('users_role_table') ?? $this->users_role_table;
+        $this->roles_primary_key        = config_item('roles_primary_key') ?? $this->roles_primary_key;
+        $this->roles_name_column        = config_item('roles_name_column') ?? $this->roles_name_column;
         $this->verify_user              = (bool) (config_item('jwt_verify_user') ?? $this->verify_user);
         $this->payload_token_expiration = (int) (config_item('payload_token_expiration') ?? $this->payload_token_expiration);
         $this->refresh_token_expiration = (int) (config_item('refresh_token_expiration') ?? $this->refresh_token_expiration);
@@ -196,7 +210,41 @@ class Api
             show_error('jwt_secret and refresh_token_key must be different values.');
         }
 
+        foreach ([
+            $this->users_table,
+            $this->users_role_column,
+            $this->users_role_table,
+            $this->roles_primary_key,
+            $this->roles_name_column,
+        ] as $identifier) {
+            if ($identifier !== '' && !preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/', $identifier)) {
+                show_error('API user-role table and column names must be valid SQL identifiers.');
+            }
+        }
+
         $this->_lava->security_headers->apply_api()->api_guard();     
+    }
+
+    private function get_user_role_record($user_id)
+    {
+        if ($this->users_role_table !== '') {
+            $stmt = $this->_lava->db->raw(
+                "SELECT u.id, r.{$this->roles_name_column} AS role
+                 FROM {$this->users_table} u
+                 LEFT JOIN {$this->users_role_table} r
+                    ON r.{$this->roles_primary_key} = u.{$this->users_role_column}
+                 WHERE u.id = ? LIMIT 1",
+                [$user_id]
+            );
+        } else {
+            $stmt = $this->_lava->db->raw(
+                "SELECT id, {$this->users_role_column} AS role
+                 FROM {$this->users_table} WHERE id = ? LIMIT 1",
+                [$user_id]
+            );
+        }
+
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     /**
@@ -542,13 +590,14 @@ class Api
      */
     protected function scopes_for_role($role)
     {
+        $normalized_role = strtolower((string) ($role ?? 'user'));
         $role_scopes = [
             'admin'  => ['read', 'write', 'delete'],
             'editor' => ['read', 'write'],
             'user'   => ['read'],
         ];
 
-        return $role_scopes[$role] ?? ['read'];
+        return $role_scopes[$normalized_role] ?? ['read'];
     }
 
     /**
@@ -570,11 +619,7 @@ class Api
         }
 
         if ($this->verify_user) {
-            $stmt = $this->_lava->db->raw(
-                "SELECT id, role FROM {$this->users_table} WHERE id = ? LIMIT 1",
-                [$payload['sub']]
-            );
-            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            $user = $this->get_user_role_record($payload['sub']);
 
             if (!$user) {
                 $this->respond_error('Unauthorized', 401);
@@ -667,11 +712,7 @@ class Api
             $this->respond_error('Refresh token expired or revoked', 403);
         }
 
-        $user_stmt = $this->_lava->db->raw(
-            "SELECT id, role FROM {$this->users_table} WHERE id = ? LIMIT 1",
-            [$payload['sub']]
-        );
-        $user = $user_stmt->fetch(PDO::FETCH_ASSOC);
+        $user = $this->get_user_role_record($payload['sub']);
 
         if (!$user) {
             $this->respond_error('User not found', 403);

@@ -56,3 +56,13 @@ $router->get('qr-verification', 'QRField::index');
 $router->post('auth/process_login', 'Auth::process_login');
 $router->post('location-clearance/store', 'Clearance::store');
 $router->post('spatial-analysis/run-screening', 'Spatial::run_screening');
+
+// API endpoints for the Vite frontend and external clients
+$router->post('api/auth/login', 'ApiController::login');
+$router->get('api/auth/me', 'ApiController::me');
+$router->post('api/auth/refresh', 'ApiController::refresh');
+$router->get('api/dashboard/stats', 'ApiController::dashboard_stats');
+$router->get('api/projects', 'ApiController::projects');
+$router->get('api/clearances', 'ApiController::clearances');
+$router->get('api/map/points', 'ApiController::map_points');
+$router->get('api/health', 'ApiController::health');

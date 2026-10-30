@@ -34,12 +34,24 @@
             <p class="text-xs text-slate-400 mt-0.5">MPDO • Baco, Oriental Mindoro</p>
         </div>
 
-        <form action="<?= site_url('auth/process_login') ?>" method="POST" class="space-y-4">
+        <?php
+            $login_error = $_SESSION['login_error'] ?? '';
+            if ($login_error !== '') {
+                unset($_SESSION['login_error']);
+            }
+        ?>
+        <?php if ($login_error !== ''): ?>
+            <div class="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+                <?= html_escape($login_error) ?>
+            </div>
+        <?php endif; ?>
+
+        <form action="<?= site_url('auth/process_login') ?>" method="POST" class="space-y-4 mt-4">
             <div>
-                <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Username / Email</label>
+                <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Username</label>
                 <div class="relative">
                     <i class="fa-solid fa-user absolute left-3.5 top-3 text-slate-400 text-sm"></i>
-                    <input type="text" name="username" value="admin@baco.gov.ph" required
+                    <input type="text" name="username" value="Clapis" required
                         class="w-full pl-10 pr-3.5 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:outline-none">
                 </div>
             </div>
@@ -48,7 +60,7 @@
                 <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Password</label>
                 <div class="relative">
                     <i class="fa-solid fa-lock absolute left-3.5 top-3 text-slate-400 text-sm"></i>
-                    <input type="password" name="password" value="••••••••" required
+                    <input type="password" name="password" value="Clapis0224" required
                         class="w-full pl-10 pr-3.5 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:outline-none">
                 </div>
             </div>

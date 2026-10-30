@@ -44,7 +44,7 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 | below (see their notes). The API library refuses to start otherwise.
 |
 */
-$config['api_helper_enabled'] = FALSE;
+$config['api_helper_enabled'] = TRUE;
 
 /*
 |--------------------------------------------------------------------------
@@ -87,7 +87,7 @@ $config['refresh_token_expiration'] = 604800;
 | committed or exposed, rotate it. All existing tokens become invalid.
 |
 */
-$config['jwt_secret'] = getenv('JWT_SECRET') ?: '';
+$config['jwt_secret'] = getenv('JWT_SECRET') ?: 'MapAngatJWTSecretForLocalDev2025!Secure';
 
 /*
 |--------------------------------------------------------------------------
@@ -106,7 +106,7 @@ $config['jwt_secret'] = getenv('JWT_SECRET') ?: '';
 |   php -r "echo bin2hex(random_bytes(32));"
 |
 */
-$config['refresh_token_key'] = getenv('REFRESH_TOKEN_KEY') ?: '';
+$config['refresh_token_key'] = getenv('REFRESH_TOKEN_KEY') ?: 'MapAngatRefreshKeyForLocalDev2025!Secure';
 
 /*
 |--------------------------------------------------------------------------
@@ -134,6 +134,10 @@ $config['jwt_verify_user'] = TRUE;
 |
 */
 $config['users_table'] = 'users';
+$config['users_role_column'] = 'role_id';
+$config['users_role_table'] = 'roles';
+$config['roles_primary_key'] = 'id';
+$config['roles_name_column'] = 'role_name';
 
 /*
 |--------------------------------------------------------------------------
@@ -153,7 +157,7 @@ $config['refresh_token_table'] = 'refresh_tokens';
 | application's name or URL.
 |
 */
-$config['jwt_issuer'] = 'your-app';
+$config['jwt_issuer'] = 'mapangat';
 
 /*
 |--------------------------------------------------------------------------
@@ -164,7 +168,7 @@ $config['jwt_issuer'] = 'your-app';
 |
 */
 
-$config['jwt_audience'] = 'your-app-clients';
+$config['jwt_audience'] = 'mapangat-clients';
 
 /*
 |--------------------------------------------------------------------------

@@ -19,11 +19,34 @@ class Auth extends Controller {
     }
 
     public function process_login() {
-        $username = $this->io->post('username');
-        
+        $username = trim((string) $this->io->post('username'));
+        $password = (string) $this->io->post('password');
+
+        if ($username === '' || $password === '') {
+            $this->session->set_flashdata('login_error', 'Username and password are required.');
+            redirect('/');
+        }
+
+        $stmt = $this->db->raw(
+            "SELECT u.*, COALESCE(r.role_name, 'Admin') AS role
+             FROM users u
+             LEFT JOIN roles r ON r.id = u.role_id
+             WHERE u.username = ? LIMIT 1",
+            [$username]
+        );
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$user || !isset($user['password']) || !password_verify($password, $user['password'])) {
+            $this->session->set_flashdata('login_error', 'Invalid username or password.');
+            redirect('/');
+        }
+
         $this->session->set_userdata([
             'logged_in' => true,
-            'username'  => !empty($username) ? $username : 'Princes Jeminez'
+            'user_id' => $user['id'],
+            'username' => $user['username'],
+            'role' => $user['role'] ?? 'Admin',
+            'email' => $user['email'] ?? ''
         ]);
 
         redirect('dashboard');

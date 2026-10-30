@@ -20,55 +20,71 @@ class Create_users_table {
             ->add_field([
                 'id' => [
                     'type'           => 'INT',
-                    'constraint'     => 11,
+                    'constraint'     => 10,
                     'unsigned'       => TRUE,
                     'auto_increment' => TRUE,
                     'null'           => FALSE,
                 ],
-                'username' => [
-                    'type'       => 'VARCHAR',
-                    'constraint' => 100,
+                'role_id' => [
+                    'type'       => 'INT',
+                    'constraint' => 10,
+                    'unsigned'   => TRUE,
                     'null'       => FALSE,
                 ],
-                'email' => [
+                'barangay_id' => [
+                    'type'       => 'INT',
+                    'constraint' => 10,
+                    'unsigned'   => TRUE,
+                    'null'       => TRUE,
+                ],
+                'username' => [
                     'type'       => 'VARCHAR',
-                    'constraint' => 255,
+                    'constraint' => 50,
                     'null'       => FALSE,
-                    'unique'     => TRUE,
                 ],
                 'password' => [
                     'type'       => 'VARCHAR',
                     'constraint' => 255,
                     'null'       => FALSE,
                 ],
-                'role' => [
-                    'type'       => 'ENUM',
-                    'constraint' => "'admin','moderator','user'",
+                'full_name' => [
+                    'type'       => 'VARCHAR',
+                    'constraint' => 100,
                     'null'       => FALSE,
-                    'default'    => 'user',
                 ],
-                'is_active' => [
-                    'type'       => 'TINYINT',
-                    'constraint' => 1,
-                    'unsigned'   => TRUE,
+                'email' => [
+                    'type'       => 'VARCHAR',
+                    'constraint' => 100,
                     'null'       => FALSE,
-                    'default'    => 1,
+                    'unique'     => TRUE,
+                ],
+                'phone_number' => [
+                    'type'       => 'VARCHAR',
+                    'constraint' => 20,
+                    'null'       => TRUE,
+                ],
+                'status' => [
+                    'type'       => 'ENUM',
+                    'constraint' => "'active','inactive'",
+                    'null'       => TRUE,
+                    'default'    => 'active',
                 ],
                 'created_at' => [
-                    'type'    => 'DATETIME',
+                    'type'    => 'TIMESTAMP',
                     'null'    => FALSE,
                     'default' => 'CURRENT_TIMESTAMP',
                 ],
                 'updated_at' => [
-                    'type'    => 'DATETIME',
-                    'null'    => TRUE,
-                    'default' => NULL,
+                    'type'    => 'TIMESTAMP',
+                    'null'    => FALSE,
+                    'default' => 'CURRENT_TIMESTAMP',
                 ],
             ])
             ->add_key('id', primary: TRUE)
             ->add_key('username', unique: TRUE, name: 'username_unique')
-            ->add_key('email', name: 'email_idx')
-            ->add_key('role', name: 'role_idx')
+            ->add_key('email', unique: TRUE, name: 'email_unique')
+            ->add_key('role_id', name: 'role_id_idx')
+            ->add_key('barangay_id', name: 'barangay_id_idx')
             ->create_table('users');
     }
 
